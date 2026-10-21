@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<meta name="ext-resource-dependency" content="img/p1.jpg" data-resource-id="p1">
+<meta name="ext-resource-dependency" content="img/p2.jpg" data-resource-id="p2">
+<meta name="ext-resource-dependency" content="img/p3.jpg" data-resource-id="p3">
+<meta name="ext-resource-dependency" content="img/p4.jpg" data-resource-id="p4">
+<template id="__bundler_thumbnail" data-bg-color="#0c0b0a"><svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="800" fill="#0c0b0a"/><circle cx="600" cy="400" r="170" fill="#ff6a13"/><text x="600" y="455" text-anchor="middle" font-family="Impact, sans-serif" font-size="150" fill="#0c0b0a">P/G/R</text></svg></template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>PLAY / GRIND / REPEAT — OVO Hydro, Glasgow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=Big+Shoulders+Display:wght@600;700;800;900&amp;family=Big+Shoulders+Stencil+Display:wght@800;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="https://unpkg.com/three@0.149.0/build/three.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<style>
+html,body{margin:0;padding:0;background:#0c0b0a;color:#f1ede6;overflow-x:clip;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+*{box-sizing:border-box}
+a{color:#ff6a13;text-decoration:none}
+a:hover{color:#f1ede6}
+::selection{background:#ff6a13;color:#0c0b0a}
+img{display:block}
+</style>
+</helmet>
+
+<div data-loader="" style="position:fixed; inset:0; z-index:100; background:#0c0b0a; display:flex; flex-direction:column; justify-content:space-between; padding:clamp(18px,3vw,40px); transition:transform 1.1s cubic-bezier(.76,0,.2,1);">
+  <div style="display:flex; justify-content:space-between; gap:16px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#8b857d;">
+    <span>Play / Grind / Repeat</span>
+    <span>Glasgow — 55.86°N 4.29°W</span>
+  </div>
+  <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px;">
+    <div data-loader-num="" style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(34vw,44svh); line-height:.8; letter-spacing:-.01em; color:#f1ede6;">000</div>
+    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#ff6a13; padding-bottom:1.2em;">Lights up</div>
+  </div>
+  <div style="position:absolute; left:0; right:0; bottom:0; height:3px; background:rgba(241,237,230,.08);">
+    <div data-loader-bar="" style="height:100%; background:#ff6a13; transform-origin:0 50%; transform:scaleX(0);"></div>
+  </div>
+</div>
+
+<canvas data-gl="" style="position:fixed; inset:0; width:100%; height:100%; z-index:20; pointer-events:none;"></canvas>
+<img data-hoop-b="" src="img/hoop.jpg" alt="" aria-hidden="true" style="position:fixed; left:0; top:0; width:100px; height:100px; z-index:15; pointer-events:none; opacity:0; mix-blend-mode:screen; transform-origin:0 0; will-change:transform;">
+<img data-hoop-f="" src="img/hoop.jpg" alt="" aria-hidden="true" style="position:fixed; left:0; top:0; width:100px; height:100px; z-index:21; pointer-events:none; opacity:0; mix-blend-mode:screen; clip-path:inset(43.5% 0 0 0); transform-origin:0 0; will-change:transform;">
+<div data-grain="" style="position:fixed; inset:-50px; z-index:40; pointer-events:none; opacity:.11; mix-blend-mode:overlay;"></div>
+<div data-cursor="" style="position:fixed; left:0; top:0; z-index:90; width:34px; height:34px; margin:-17px 0 0 -17px; border:1.5px solid #f1ede6; border-radius:50%; pointer-events:none; mix-blend-mode:difference; opacity:0; transition:width .25s, height .25s, margin .25s, background .25s;"></div>
+<div data-hint="" style="position:fixed; left:0; top:0; z-index:45; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:#f1ede6; opacity:0; white-space:nowrap; transform:translate(-50%,0);">Tap the ball</div>
+
+<header style="position:fixed; top:0; left:0; right:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:clamp(14px,2vw,26px) clamp(16px,3vw,40px);">
+  <a href="#top" style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:clamp(16px,1.6vw,20px); letter-spacing:.02em; color:#f1ede6; display:flex; gap:.12em; text-transform:uppercase;">
+    <span>Play</span><span style="color:#ff6a13;">/</span><span>Grind</span><span style="color:#ff6a13;">/</span><span>Repeat</span>
+  </a>
+  <div style="display:flex; align-items:center; gap:clamp(10px,2vw,28px);">
+    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em; color:#f1ede6;">14—16.05.27</span>
+    <a href="#tickets" style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:16px; letter-spacing:.06em; text-transform:uppercase; background:#ff6a13; color:#0c0b0a; padding:13px 16px 12px;" style-hover="background:#f1ede6; color:#0c0b0a;">Tickets</a>
+  </div>
+</header>
+
+<div style="position:fixed; left:clamp(16px,3vw,40px); bottom:clamp(14px,2vw,26px); z-index:60; display:flex; gap:10px; align-items:center; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#f1ede6; pointer-events:none;">
+  <span data-chap-n="" style="color:#ff6a13;">01</span><span style="width:28px; height:1px; background:rgba(241,237,230,.5);"></span><span data-chap-l="">The Clyde</span>
+</div>
+<div style="position:fixed; right:clamp(8px,1.2vw,16px); top:50%; z-index:60; width:2px; height:28vh; margin-top:-14vh; background:rgba(241,237,230,.14); pointer-events:none;">
+  <div data-prog="" style="width:100%; height:100%; background:#ff6a13; transform-origin:50% 0; transform:scaleY(0);"></div>
+</div>
+
+<section id="top" data-sec="hero" data-sticky="" data-screen-label="Hero film" style="position:relative; height:640vh;">
+  <div data-stage="" style="position:sticky; top:0; height:100svh; overflow:hidden; background:#0c0b0a;">
+    <div data-layer="0" style="position:absolute; inset:0; overflow:hidden;">
+      <img data-hero-img="" src="img/river.jpg" alt="The Clyde at night, the arena glowing across the water" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scale(1.06); will-change:transform;">
+    </div>
+    <div data-layer="1" style="position:absolute; inset:0; overflow:hidden; clip-path:circle(0% at 50% 50%);">
+      <img data-hero-img="" src="img/doors.jpg" alt="Fans walking toward the arena doors in the rain" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; will-change:transform;">
+    </div>
+    <div data-layer="2" style="position:absolute; inset:0; overflow:hidden; clip-path:inset(50% 50% 50% 50%);">
+      <img data-hero-img="" src="img/tunnel.jpg" alt="The players' tunnel opening onto the court" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; will-change:transform;">
+    </div>
+    <div data-layer="3" style="position:absolute; inset:0; overflow:hidden; clip-path:circle(0% at 50% 40%);">
+      <img data-hero-img="" src="img/court.jpg" alt="A basketball on the court under a single spotlight" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; will-change:transform;">
+    </div>
+    <div style="position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 45%, rgba(12,11,10,0) 40%, rgba(12,11,10,.75) 100%), linear-gradient(to top, rgba(12,11,10,.9) 0%, rgba(12,11,10,0) 42%);"></div>
+    <div data-flash="" style="position:absolute; inset:0; background:#fff1e0; opacity:0; mix-blend-mode:screen;"></div>
+
+    <div data-wordmark="" style="position:absolute; left:clamp(16px,3vw,40px); right:clamp(16px,3vw,40px); top:50%; transform:translateY(-54%); font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(18.5vw,27svh); line-height:.8; letter-spacing:-.005em; text-transform:uppercase; color:#f1ede6;">
+      <div data-wl="" style="display:flex; overflow:hidden; padding-bottom:.03em;"><span data-ch="" style="display:inline-block; transform:translateY(105%);">P</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">L</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">A</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">Y</span><span data-ch="" style="display:inline-block; transform:translateY(105%); color:#ff6a13;">/</span></div>
+      <div data-wl="" style="display:flex; overflow:hidden; padding-bottom:.03em; padding-left:.55em;"><span data-ch="" style="display:inline-block; transform:translateY(105%);">G</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">R</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">I</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">N</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">D</span><span data-ch="" style="display:inline-block; transform:translateY(105%); color:#ff6a13;">/</span></div>
+      <div data-wl="" style="display:flex; overflow:hidden; padding-bottom:.03em; padding-left:.18em;"><span data-ch="" style="display:inline-block; transform:translateY(105%);">R</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">E</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">P</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">E</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">A</span><span data-ch="" style="display:inline-block; transform:translateY(105%);">T</span></div>
+    </div>
+
+    <div data-hmeta="" style="position:absolute; left:clamp(16px,3vw,40px); right:clamp(16px,3vw,40px); bottom:clamp(52px,6vw,72px); display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:14px 32px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#f1ede6; opacity:0;">
+      <div style="display:flex; flex-direction:column; gap:6px;"><span style="color:#ff6a13;">Street basketball championship</span><span>3×3 by day — 5×5 under the lights</span></div>
+      <div style="display:flex; flex-direction:column; gap:6px;"><span style="color:#8b857d;">OVO Hydro, Glasgow</span><span>Fri 14 — Sun 16 May 2027</span></div>
+      <div style="display:flex; align-items:center; gap:10px;"><span>Scroll to enter</span><span style="width:1px; height:28px; background:#ff6a13;"></span></div>
+    </div>
+
+    <div data-beat="1" style="position:absolute; left:clamp(16px,3vw,40px); bottom:clamp(64px,9vh,110px); opacity:0; max-width:92vw;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:12px;">02 — The doors</div>
+      <div style="display:flex; overflow:hidden; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(26vw,34svh); line-height:.8; text-transform:uppercase;"><span data-ch="" style="display:inline-block;">P</span><span data-ch="" style="display:inline-block;">L</span><span data-ch="" style="display:inline-block;">A</span><span data-ch="" style="display:inline-block;">Y</span><span data-ch="" style="display:inline-block; color:#ff6a13;">.</span></div>
+      <p style="margin:18px 0 0; max-width:340px; font-family:Archivo,sans-serif; font-size:clamp(15px,1.3vw,18px); line-height:1.45; color:#f1ede6; text-wrap:pretty;">Sixteen crews from every corner of the country walk through the same doors.</p>
+    </div>
+
+    <div data-beat="2" style="position:absolute; right:clamp(16px,3vw,40px); top:clamp(84px,14vh,150px); opacity:0; text-align:right; display:flex; flex-direction:column; align-items:flex-end; max-width:92vw;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:12px;">03 — The tunnel</div>
+      <div style="display:flex; overflow:hidden; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(24vw,34svh); line-height:.8; text-transform:uppercase;"><span data-ch="" style="display:inline-block;">G</span><span data-ch="" style="display:inline-block;">R</span><span data-ch="" style="display:inline-block;">I</span><span data-ch="" style="display:inline-block;">N</span><span data-ch="" style="display:inline-block;">D</span><span data-ch="" style="display:inline-block; color:#ff6a13;">.</span></div>
+      <p style="margin:18px 0 0; max-width:320px; font-family:Archivo,sans-serif; font-size:clamp(15px,1.3vw,18px); line-height:1.45; color:#f1ede6; text-wrap:pretty;">Forty minutes. Full court. Nowhere to hide.</p>
+    </div>
+
+    <div data-beat="3" style="position:absolute; left:0; right:0; bottom:clamp(64px,9vh,110px); opacity:0; display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 16px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:12px;">04 — The floor</div>
+      <div style="display:flex; overflow:hidden; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(23vw,30svh); line-height:.8; text-transform:uppercase;"><span data-ch="" style="display:inline-block;">R</span><span data-ch="" style="display:inline-block;">E</span><span data-ch="" style="display:inline-block;">P</span><span data-ch="" style="display:inline-block;">E</span><span data-ch="" style="display:inline-block;">A</span><span data-ch="" style="display:inline-block;">T</span><span data-ch="" style="display:inline-block; color:#ff6a13;">.</span></div>
+      <p style="margin:18px 0 0; max-width:380px; font-family:Archivo,sans-serif; font-size:clamp(15px,1.3vw,18px); line-height:1.45; color:#f1ede6; text-wrap:pretty;">Win. Sleep. Do it again. The last crew standing lifts the Clyde Cup.</p>
+    </div>
+    <div data-endfade="" style="position:absolute; inset:0; background:#0c0b0a; opacity:0; pointer-events:none;"></div>
+  </div>
+</section>
+
+<section data-sec="man" data-sticky="" data-screen-label="Manifesto" style="position:relative; height:340vh;">
+  <div data-stage="" style="position:sticky; top:0; height:100svh; overflow:hidden; background:#0c0b0a;">
+    <img data-man-img="" src="img/street.jpg" alt="An outdoor Glasgow court in the rain" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.42; transform:scale(1.2); will-change:transform;">
+    <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(12,11,10,.85) 0%, rgba(12,11,10,.2) 40%, rgba(12,11,10,.92) 100%);"></div>
+    <div style="position:absolute; left:0; right:0; top:clamp(76px,12vh,130px); display:flex; flex-direction:column; gap:.04em; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(15vw,14svh); line-height:.86; text-transform:uppercase; white-space:nowrap;">
+      <div data-mq="0" style="will-change:transform; color:#f1ede6;">No league — No scouts — No excuses — No league — No scouts — No excuses —</div>
+      <div data-mq="1" style="will-change:transform; color:transparent; -webkit-text-stroke:1.5px #ff6a13;">Born on concrete — Raised in the rain — Born on concrete — Raised in the rain —</div>
+    </div>
+    <div style="position:absolute; left:clamp(16px,3vw,40px); right:clamp(16px,3vw,40px); bottom:clamp(56px,10vh,110px); display:flex; flex-direction:column; gap:18px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">05 — The code</div>
+      <p style="margin:0; max-width:27ch; font-family:Archivo,sans-serif; font-weight:600; font-size:clamp(22px,min(3.4vw,4.8svh),52px); line-height:1.1; letter-spacing:-.01em; display:flex; flex-wrap:wrap; column-gap:.26em;">
+        <sc-for list="{{ words }}" as="w" hint-placeholder-count="30"><span data-w="" style="opacity:.14;">{{ w.w }}</span></sc-for>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section data-sec="week" data-sticky="" data-screen-label="The weekend" style="position:relative; height:400vh;">
+  <div data-stage="" style="position:sticky; top:0; height:100svh; overflow:hidden; background:#0c0b0a;">
+    <div data-track="" style="position:absolute; top:0; left:0; height:100%; display:flex; will-change:transform;">
+      <div style="flex:0 0 auto; width:min(92vw,820px); height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:clamp(90px,14vh,140px) clamp(16px,3vw,40px) clamp(64px,10vh,110px);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:18px;">06 — The weekend</div>
+        <h2 style="margin:0; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(16vw,20svh); line-height:.82; text-transform:uppercase;">Three days.<br><span style="color:#ff6a13;">One roof.</span></h2>
+        <p style="margin:22px 0 0; max-width:380px; font-family:Archivo,sans-serif; font-size:16px; line-height:1.5; color:#bdb7ae; text-wrap:pretty;">Four courts on the floor for the 3×3 bracket. Then one court in the middle and the lights go down for the 5×5.</p>
+      </div>
+      <sc-for list="{{ days }}" as="day" hint-placeholder-count="3">
+        <div style="flex:0 0 auto; width:min(88vw,600px); height:100%; border-left:1px solid rgba(241,237,230,.14); display:flex; flex-direction:column; justify-content:space-between; padding:clamp(84px,13vh,130px) clamp(18px,3vw,44px) clamp(56px,9vh,100px);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">{{ day.d }} — May 2027</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">{{ day.k }}</span>
+          </div>
+          <div>
+            <div data-daynum="" style="font-family:'Big Shoulders Stencil Display',sans-serif; font-weight:900; font-size:min(44vw,40svh); line-height:.78; color:transparent; -webkit-text-stroke:2px #ff6a13;">{{ day.n }}</div>
+            <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(40px,5.4vw,72px); line-height:.9; text-transform:uppercase; margin:14px 0 22px;">{{ day.t }}</div>
+            <div style="display:flex; flex-direction:column;">
+              <sc-for list="{{ day.items }}" as="it" hint-placeholder-count="4">
+                <div style="display:grid; grid-template-columns:64px minmax(0,1fr); gap:16px; padding:12px 0; border-top:1px solid rgba(241,237,230,.14); font-family:Archivo,sans-serif; font-size:clamp(15px,1.2vw,17px);">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#ff6a13; padding-top:2px;">{{ it.t }}</span>
+                  <span>{{ it.e }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="flex:0 0 auto; width:min(80vw,520px); height:100%; border-left:1px solid rgba(241,237,230,.14); display:flex; flex-direction:column; justify-content:center; padding:0 clamp(18px,3vw,44px);">
+        <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(14vw,16svh); line-height:.84; text-transform:uppercase; color:#f1ede6;">Doors<br>17:00<br><span style="color:#ff6a13;">Friday.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="crews" data-sec="crews" data-screen-label="The crews" style="position:relative; padding:clamp(110px,16vh,200px) clamp(16px,3vw,40px) clamp(80px,12vh,160px); background:#0c0b0a;">
+  <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:clamp(40px,7vw,96px);">
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:18px;">07 — The crews</div>
+      <h2 style="margin:0; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(56px,10vw,168px); line-height:.82; text-transform:uppercase;">Sixteen crews.<br><span style="color:transparent; -webkit-text-stroke:1.5px #f1ede6;">Four to watch.</span></h2>
+    </div>
+    <p style="margin:0; max-width:340px; font-family:Archivo,sans-serif; font-size:16px; line-height:1.5; color:#bdb7ae; text-wrap:pretty;">Seeded from a summer of open runs across Scotland. These four came through unbeaten.</p>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,250px),1fr)); gap:clamp(14px,1.6vw,24px); align-items:start;">
+    <sc-for list="{{ featured }}" as="f" hint-placeholder-count="4">
+      <div data-par="{{ f.par }}" style="will-change:transform;">
+        <div data-tilt="" data-hover="" role="button" tabindex="0" aria-label="Open player profile" onClick="{{ f.open }}" style="perspective:900px; cursor:pointer;">
+          <div data-tilt-in="" style="position:relative; aspect-ratio:3/4; overflow:hidden; background:#1a1816; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.2,.8,.2,1);">
+            <img data-tilt-img="" src="{{ f.img }}" alt="{{ f.player }}" loading="lazy" style="position:absolute; inset:-4%; width:108%; height:108%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.8,.2,1);">
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(12,11,10,.95) 0%, rgba(12,11,10,.1) 50%, rgba(12,11,10,0) 100%);"></div>
+            <div style="position:absolute; top:14px; left:16px; right:16px; display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#f1ede6;"><span style="color:#ff6a13;">Seed {{ f.seed }}</span><span>{{ f.area }}</span></div>
+            <div style="position:absolute; left:16px; right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(34px,3.2vw,46px); line-height:.86; text-transform:uppercase;">{{ f.crew }}</div>
+              <div style="font-family:Archivo,sans-serif; font-weight:600; font-size:15px;">{{ f.player }} <span style="color:#8b857d; font-weight:400;">— {{ f.role }}</span></div>
+              <div style="font-family:Archivo,sans-serif; font-size:14px; line-height:1.4; color:#bdb7ae; text-wrap:pretty;">“{{ f.quote }}”</div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px; padding-top:10px; border-top:1px solid rgba(241,237,230,.2); font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;"><span>Player profile</span><span style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; background:#ff6a13; color:#0c0b0a; font-size:16px; letter-spacing:0;">+</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top:clamp(80px,12vw,160px); display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; padding-bottom:14px; border-bottom:1px solid rgba(241,237,230,.2);">
+    <span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(32px,4vw,56px); text-transform:uppercase;">The field</span>
+    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Seed — Crew — Home court</span>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,520px),1fr)); column-gap:clamp(24px,4vw,64px);">
+    <sc-for list="{{ crews }}" as="c" hint-placeholder-count="16">
+      <div data-hover="" role="button" tabindex="0" aria-label="Open team roster" onClick="{{ c.open }}" style="cursor:pointer; display:grid; grid-template-columns:44px minmax(0,1fr) auto auto; align-items:baseline; gap:14px; padding:14px 10px; border-bottom:1px solid rgba(241,237,230,.12); color:#f1ede6; transition:background .25s, color .25s, padding .25s;" style-hover="background:#ff6a13; color:#0c0b0a; padding-left:20px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.1em;">{{ c.s }}</span>
+        <span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:clamp(28px,3.4vw,48px); line-height:1; text-transform:uppercase;">{{ c.n }}</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase;">{{ c.a }}</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:14px;">→</span>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<div data-bio="" data-lenis-prevent="" role="dialog" aria-modal="true" aria-label="Player profile" style="position:fixed; inset:0; z-index:85; background:#0c0b0a; transform:translateY(102%); transition:transform .95s cubic-bezier(.76,0,.2,1); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;">
+  <div data-bio-in="" style="min-height:100%; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,440px),1fr)); transition:opacity .25s;">
+    <div style="position:relative; min-height:62svh; overflow:hidden; background:#1a1816;">
+      <img data-bio-img="" src="{{ bio.img }}" alt="{{ bio.player }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 20%; transform:scale(1.12); transition:transform 1.6s cubic-bezier(.2,.8,.2,1);">
+      <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(12,11,10,.85) 0%, rgba(12,11,10,0) 45%);"></div>
+      <div style="position:absolute; left:clamp(16px,3vw,40px); bottom:clamp(14px,2.4vw,32px); font-family:'Big Shoulders Stencil Display',sans-serif; font-weight:900; font-size:min(42vw,34svh); line-height:.76; color:transparent; -webkit-text-stroke:2px #ff6a13;">{{ bio.num }}</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:clamp(22px,3vh,36px); padding:clamp(20px,3vw,48px) clamp(16px,3vw,48px) clamp(32px,5vw,56px);">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Seed {{ bio.seed }} — {{ bio.area }}</span>
+        <button type="button" onClick="{{ closeBio }}" data-hover="" style="appearance:none; border:1.5px solid #f1ede6; background:transparent; color:#f1ede6; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:12px 16px; cursor:pointer; min-height:44px;" style-hover="background:#f1ede6; color:#0c0b0a;">Close ✕</button>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:14px;">{{ bio.crew }}</div>
+        <h3 style="margin:0; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(60px,8vw,128px); line-height:.82; text-transform:uppercase;">{{ bio.first }}<br>{{ bio.last }}</h3>
+        <div style="margin-top:14px; font-family:Archivo,sans-serif; font-size:17px; color:#bdb7ae;">{{ bio.role }} · #{{ bio.num }}</div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid rgba(241,237,230,.2); border-bottom:1px solid rgba(241,237,230,.2);">
+        <sc-for list="{{ bio.stats }}" as="st" hint-placeholder-count="3">
+          <div style="display:flex; flex-direction:column; gap:6px; padding:18px 12px 16px 0;">
+            <span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(40px,4.4vw,64px); line-height:.9; color:#f1ede6;">{{ st.v }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">{{ st.k }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:0; max-width:52ch; font-family:Archivo,sans-serif; font-size:clamp(17px,1.4vw,20px); line-height:1.55; color:#f1ede6; text-wrap:pretty;">{{ bio.bio }}</p>
+      <div style="display:flex; flex-direction:column;">
+        <sc-for list="{{ bio.facts }}" as="fa" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:140px minmax(0,1fr); gap:16px; padding:12px 0; border-top:1px solid rgba(241,237,230,.12);">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d; padding-top:3px;">{{ fa.k }}</span>
+            <span style="font-family:Archivo,sans-serif; font-size:16px;">{{ fa.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button type="button" onClick="{{ prevBio }}" data-hover="" style="appearance:none; text-align:left; border:1px solid rgba(241,237,230,.2); background:transparent; color:#f1ede6; padding:14px 16px; cursor:pointer; display:flex; flex-direction:column; gap:6px; min-height:44px;" style-hover="border-color:#f1ede6;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">← Previous</span><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:22px; text-transform:uppercase;">{{ bio.prevName }}</span></button>
+        <button type="button" onClick="{{ nextBio }}" data-hover="" style="appearance:none; text-align:right; border:none; background:#ff6a13; color:#0c0b0a; padding:14px 16px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-end; gap:6px; min-height:44px;" style-hover="background:#f1ede6;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;">Next →</span><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:22px; text-transform:uppercase;">{{ bio.nextName }}</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div data-team-bg="" onClick="{{ closeTeam }}" style="position:fixed; inset:0; z-index:83; background:rgba(12,11,10,.72); opacity:0; pointer-events:none; transition:opacity .6s;"></div>
+<aside data-team="" data-lenis-prevent="" role="dialog" aria-modal="true" aria-label="Team roster" style="position:fixed; top:0; right:0; bottom:0; width:min(600px,100vw); z-index:84; background:#0c0b0a; border-left:1px solid rgba(241,237,230,.16); transform:translateX(104%); transition:transform .85s cubic-bezier(.76,0,.2,1); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;">
+  <div data-team-in="" style="display:flex; flex-direction:column; gap:28px; min-height:100%; padding:clamp(18px,3vw,40px) clamp(16px,3vw,40px) clamp(28px,4vw,48px); transition:opacity .22s;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Team sheet — Seed {{ team.s }} of 16</span>
+      <button type="button" onClick="{{ closeTeam }}" data-hover="" style="appearance:none; border:1.5px solid #f1ede6; background:transparent; color:#f1ede6; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; padding:12px 16px; cursor:pointer; min-height:44px;" style-hover="background:#f1ede6; color:#0c0b0a;">Close ✕</button>
+    </div>
+    <div style="position:relative;">
+      <div style="position:absolute; right:0; top:-14px; font-family:'Big Shoulders Stencil Display',sans-serif; font-weight:900; font-size:clamp(120px,22vw,180px); line-height:.8; color:transparent; -webkit-text-stroke:1.5px rgba(255,106,19,.55); pointer-events:none;">{{ team.s }}</div>
+      <div style="position:relative; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:12px;">{{ team.a }}</div>
+      <h3 style="position:relative; margin:0; max-width:9ch; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(56px,9vw,96px); line-height:.84; text-transform:uppercase;">{{ team.n }}</h3>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid rgba(241,237,230,.2); border-bottom:1px solid rgba(241,237,230,.2);">
+      <div style="display:flex; flex-direction:column; gap:6px; padding:16px 10px 14px 0;"><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(34px,4vw,48px); line-height:.9;">{{ team.rec }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Summer W–L</span></div>
+      <div style="display:flex; flex-direction:column; gap:6px; padding:16px 10px 14px 0;"><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(34px,4vw,48px); line-height:.9;">{{ team.ppg }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Points / game</span></div>
+      <div style="display:flex; flex-direction:column; gap:6px; padding:16px 10px 14px 0;"><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(34px,4vw,48px); line-height:.9;">{{ team.est }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Founded</span></div>
+    </div>
+    <div style="display:grid; grid-template-columns:110px minmax(0,1fr); gap:6px 16px; font-family:Archivo,sans-serif; font-size:15px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d; padding-top:3px;">Coach</span><span>{{ team.coach }}</span>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d; padding-top:3px;">Home court</span><span>{{ team.court }}</span>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d; padding-top:3px;">Opens</span><span>{{ team.first }}</span>
+    </div>
+    <div>
+      <div style="display:grid; grid-template-columns:44px minmax(0,1fr) 44px 64px; gap:12px; padding:0 0 10px; border-bottom:1px solid rgba(241,237,230,.3); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;"><span>No.</span><span>Player</span><span>Pos</span><span style="text-align:right;">Height</span></div>
+      <sc-for list="{{ team.players }}" as="pl" hint-placeholder-count="8">
+        <div style="display:grid; grid-template-columns:44px minmax(0,1fr) 44px 64px; gap:12px; align-items:baseline; padding:13px 0; border-bottom:1px solid rgba(241,237,230,.12);">
+          <span style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:26px; line-height:1; color:#ff6a13;">{{ pl.no }}</span>
+          <span style="display:flex; flex-direction:column; gap:3px; min-width:0;"><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:24px; line-height:1; text-transform:uppercase;">{{ pl.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#8b857d;">{{ pl.tag }}</span></span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.08em;">{{ pl.pos }}</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; text-align:right; color:#bdb7ae;">{{ pl.h }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <button type="button" onClick="{{ prevTeam }}" data-hover="" style="appearance:none; text-align:left; border:1px solid rgba(241,237,230,.2); background:transparent; color:#f1ede6; padding:14px 16px; cursor:pointer; display:flex; flex-direction:column; gap:6px; min-height:44px;" style-hover="border-color:#f1ede6;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">← Previous</span><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:20px; text-transform:uppercase;">{{ team.prevName }}</span></button>
+      <button type="button" onClick="{{ nextTeam }}" data-hover="" style="appearance:none; text-align:right; border:none; background:#ff6a13; color:#0c0b0a; padding:14px 16px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-end; gap:6px; min-height:44px;" style-hover="background:#f1ede6;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;">Next →</span><span style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:20px; text-transform:uppercase;">{{ team.nextName }}</span></button>
+    </div>
+  </div>
+</aside>
+
+<section data-sec="venue" data-sticky="" data-screen-label="The Hydro" style="position:relative; height:260vh;">
+  <div data-stage="" style="position:sticky; top:0; height:100svh; overflow:hidden; background:#0c0b0a;">
+    <div data-venue-clip="" style="position:absolute; inset:0; overflow:hidden; clip-path:inset(26% 30% 26% 30%);">
+      <img data-venue-img="" src="img/crowd.jpg" alt="A packed arena on its feet under orange light" loading="lazy" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scale(1.35); will-change:transform;">
+      <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(12,11,10,.92) 0%, rgba(12,11,10,.15) 55%, rgba(12,11,10,.5) 100%);"></div>
+    </div>
+    <div style="position:absolute; left:clamp(16px,3vw,40px); top:clamp(84px,13vh,130px); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">08 — The Hydro</div>
+    <div style="position:absolute; left:0; right:0; top:50%; transform:translateY(-58%); display:flex; flex-direction:column; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(17vw,21svh); line-height:.82; text-transform:uppercase; padding:0 clamp(16px,3vw,40px);">
+      <div data-vl="0" style="opacity:0; will-change:transform;">14,300 seats.</div>
+      <div data-vl="1" style="opacity:0; align-self:flex-end; color:#ff6a13; will-change:transform;">One court.</div>
+    </div>
+    <div data-vdet="" style="position:absolute; left:clamp(16px,3vw,40px); right:clamp(16px,3vw,40px); bottom:clamp(56px,9vh,96px); display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,220px),1fr)); gap:18px 32px; opacity:0;">
+      <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid rgba(241,237,230,.3); padding-top:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Venue</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.4;">OVO Hydro, Exhibition Way, Glasgow G3 8YW</span></div>
+      <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid rgba(241,237,230,.3); padding-top:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Getting here</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.4;">Exhibition Centre station, two minutes on foot</span></div>
+      <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid rgba(241,237,230,.3); padding-top:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">Doors</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.4;">Fri 17:00 · Sat 11:00 · Sun 12:00</span></div>
+    </div>
+  </div>
+</section>
+
+<section data-sec="shot" data-sticky="" data-screen-label="The last shot" style="position:relative; height:300vh;">
+  <div data-stage="" style="position:sticky; top:0; height:100svh; overflow:hidden; background:#0c0b0a;">
+    <div data-spot="" style="position:absolute; inset:0; background:radial-gradient(42% 60% at 64% 18%, rgba(255,140,60,.28) 0%, rgba(255,106,19,.06) 45%, rgba(12,11,10,0) 75%);"></div>
+    <div data-swishword="" style="position:absolute; left:0; right:0; top:50%; transform:translateY(-50%) scale(.8); text-align:center; font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:32vw; line-height:.8; text-transform:uppercase; color:transparent; -webkit-text-stroke:1.5px rgba(255,106,19,.5); opacity:0; white-space:nowrap;">Swish</div>
+    <div style="position:absolute; left:clamp(16px,3vw,40px); right:clamp(16px,3vw,40px); bottom:clamp(56px,9vh,100px); display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13;">09 — The last shot</div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:min(15vw,17svh); line-height:.82; text-transform:uppercase;">Sunday.<br>20:00.</div>
+      <div data-swish="" style="opacity:0; display:flex; flex-wrap:wrap; align-items:center; gap:16px 24px; transform:translateY(20px);">
+        <span style="font-family:Archivo,sans-serif; font-size:clamp(16px,1.4vw,19px); max-width:360px; line-height:1.45; text-wrap:pretty;">One game left and one cup on the table. Be in the building when it drops.</span>
+        <a href="#tickets" data-hover="" style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:20px; letter-spacing:.06em; text-transform:uppercase; background:#ff6a13; color:#0c0b0a; padding:14px 22px 12px;" style-hover="background:#f1ede6; color:#0c0b0a;">Get in →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tickets" data-sec="tix" data-screen-label="Tickets" style="position:relative; padding:clamp(110px,16vh,200px) clamp(16px,3vw,40px) clamp(80px,12vh,140px); background:#0c0b0a;">
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#ff6a13; margin-bottom:18px;">10 — Tickets</div>
+  <h2 style="margin:0 0 clamp(40px,6vw,80px); font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(56px,10vw,168px); line-height:.82; text-transform:uppercase;">Pick your<br><span style="color:#ff6a13;">days.</span></h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,280px),1fr)); gap:clamp(14px,1.6vw,24px);">
+    <div data-hover="" style="display:flex; flex-direction:column; gap:22px; padding:clamp(22px,2.4vw,34px); border:1px solid rgba(241,237,230,.2); transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s;" style-hover="transform:translateY(-6px); border-color:#f1ede6;">
+      <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;"><span>Any one day</span><span>Standing</span></div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:40px; line-height:.9; text-transform:uppercase;">Day pass</div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(84px,8vw,120px); line-height:.8;">£18</div>
+      <p style="margin:0; font-family:Archivo,sans-serif; font-size:15px; line-height:1.5; color:#bdb7ae;">All four courts, all day. Come for the 3×3, stay for whatever happens next.</p>
+      <a href="#tickets" style="margin-top:auto; text-align:center; font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:18px; letter-spacing:.06em; text-transform:uppercase; border:1.5px solid #f1ede6; color:#f1ede6; padding:14px 18px 12px;" style-hover="background:#f1ede6; color:#0c0b0a;">Choose a day</a>
+    </div>
+    <div data-hover="" style="display:flex; flex-direction:column; gap:22px; padding:clamp(22px,2.4vw,34px); background:#ff6a13; color:#0c0b0a; transition:transform .35s cubic-bezier(.2,.8,.2,1);" style-hover="transform:translateY(-6px);">
+      <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase;"><span>All three days</span><span>Most picked</span></div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:40px; line-height:.9; text-transform:uppercase;">The weekend</div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(84px,8vw,120px); line-height:.8;">£42</div>
+      <p style="margin:0; font-family:Archivo,sans-serif; font-size:15px; line-height:1.5;">Friday to Sunday, with a reserved seat for both 5×5 nights and the final.</p>
+      <a href="#tickets" style="margin-top:auto; text-align:center; font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:18px; letter-spacing:.06em; text-transform:uppercase; background:#0c0b0a; color:#f1ede6; padding:15px 18px 13px;" style-hover="background:#f1ede6; color:#0c0b0a;">Get the weekend</a>
+    </div>
+    <div data-hover="" style="display:flex; flex-direction:column; gap:22px; padding:clamp(22px,2.4vw,34px); border:1px solid rgba(241,237,230,.2); transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .35s;" style-hover="transform:translateY(-6px); border-color:#f1ede6;">
+      <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;"><span>Sunday only</span><span>120 seats</span></div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:40px; line-height:.9; text-transform:uppercase;">Courtside</div>
+      <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:clamp(84px,8vw,120px); line-height:.8;">£120</div>
+      <p style="margin:0; font-family:Archivo,sans-serif; font-size:15px; line-height:1.5; color:#bdb7ae;">Floor seats for the final, close enough to hear the calls. Warm-up access included.</p>
+      <a href="#tickets" style="margin-top:auto; text-align:center; font-family:'Big Shoulders Display',sans-serif; font-weight:800; font-size:18px; letter-spacing:.06em; text-transform:uppercase; border:1.5px solid #f1ede6; color:#f1ede6; padding:14px 18px 12px;" style-hover="background:#f1ede6; color:#0c0b0a;">Go courtside</a>
+    </div>
+  </div>
+</section>
+
+<footer data-sec="foot" style="position:relative; overflow:hidden; padding:clamp(60px,9vw,120px) clamp(16px,3vw,40px) clamp(64px,8vh,90px); border-top:1px solid rgba(241,237,230,.14); background:#0c0b0a;">
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,200px),1fr)); gap:28px; margin-bottom:clamp(48px,7vw,96px);">
+    <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Where</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.5;">OVO Hydro<br>Exhibition Way, Glasgow G3 8YW</span></div>
+    <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">When</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.5;">Friday 14 to Sunday 16<br>May 2027</span></div>
+    <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Follow</span><div style="display:flex; gap:18px; font-family:Archivo,sans-serif; font-size:15px;"><a href="#top">Instagram</a><a href="#top">TikTok</a><a href="#top">YouTube</a></div></div>
+    <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:#8b857d;">Note</span><span style="font-family:Archivo,sans-serif; font-size:15px; line-height:1.5; color:#bdb7ae;">A concept site for a fictional event.</span></div>
+  </div>
+  <div style="font-family:'Big Shoulders Display',sans-serif; font-weight:900; font-size:12.4vw; line-height:.78; text-transform:uppercase; white-space:nowrap; letter-spacing:-.01em;">Play<span style="color:#ff6a13;">/</span>Grind<span style="color:#ff6a13;">/</span>Repeat</div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;rain&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Atmosphere&quot;}, &quot;grain&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Atmosphere&quot;}, &quot;smooth&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Motion&quot;}}">
+class Component extends DCLogic {
+  state = { sel: 0, team: 0 };
+  renderVals() {
+    const words = "Every crew here learned the game outside. Cracked tarmac in Govanhill. Bent rims in Possil. Nets made of chain. For one weekend, Scotland's street game moves under the biggest roof in the city. Same rules as ever.".split(' ').map(w => ({ w }));
+    const F = this._featured(), si = this.state.sel || 0, n = F.length;
+    const bio = Object.assign({}, F[si], { prevName: F[(si + n - 1) % n].player, nextName: F[(si + 1) % n].player });
+    const C = this._crews(), ti = this.state.team || 0, cn = C.length;
+    const team = Object.assign({}, C[ti], { prevName: C[(ti + cn - 1) % cn].n, nextName: C[(ti + 1) % cn].n });
+    return {
+      bio,
+      team,
+      closeTeam: () => this.closeTeam(),
+      nextTeam: () => this.stepTeam(1),
+      prevTeam: () => this.stepTeam(-1),
+      closeBio: () => this.closeBio(),
+      nextBio: () => this.stepBio(1),
+      prevBio: () => this.stepBio(-1),
+      words,
+      days: [
+        { n: '14', d: 'Friday', k: 'Day 01', t: 'Open run', items: [{ t: '17:00', e: 'Doors open' }, { t: '18:00', e: '3×3 qualifiers, courts A to D' }, { t: '21:00', e: 'Dunk contest' }, { t: '23:00', e: 'Last ball' }] },
+        { n: '15', d: 'Saturday', k: 'Day 02', t: 'The grind', items: [{ t: '11:00', e: '3×3 knockouts' }, { t: '15:00', e: 'Under-16 showcase' }, { t: '19:30', e: '5×5 quarter-finals' }, { t: '22:00', e: 'DJ set on court' }] },
+        { n: '16', d: 'Sunday', k: 'Day 03', t: 'Repeat', items: [{ t: '12:00', e: '3×3 final' }, { t: '16:00', e: '5×5 semi-finals' }, { t: '20:00', e: 'The final' }, { t: '21:45', e: 'The Clyde Cup is lifted' }] }
+      ],
+      featured: this._featured(),
+      crews: this._crews(),
+    };
+  }
+
+  _featured() {
+    if (this.__f) return this.__f;
+    const F = [
+      { img: ((window.__resources || {}).p1 || 'img/p1.jpg'), seed: '01', area: 'Gorbals', crew: 'Gorbals Ghosts', player: 'Kofi Mensah', role: 'Point guard', num: '03', quote: 'Learned to play on a court with no nets.', par: '0',
+        bio: "Grew up two closes from the Gorbals cage and spent every summer there until the floodlights went off. Runs the floor like he's late for something. Led the Ghosts through the qualifiers without dropping a game, and still hasn't bought a pair of trainers that weren't on sale.",
+        stats: [{ v: '21.4', k: 'Points' }, { v: '8.2', k: 'Assists' }, { v: '2.6', k: 'Steals' }],
+        facts: [{ k: 'Height', v: "6'1\" / 185 cm" }, { k: 'Age', v: '24' }, { k: 'Home court', v: 'Gorbals cage, Cumberland St' }, { k: 'Signature', v: 'Hesitation into the left-hand floater' }] },
+      { img: ((window.__resources || {}).p2 || 'img/p2.jpg'), seed: '02', area: 'Shawlands', crew: 'Southside Saints', player: 'Shona Adeyemi', role: 'Shooting guard', num: '11', quote: 'Range from anywhere south of the river.', par: '0.14',
+        bio: "Played netball until she was fifteen, then found a court behind Queen's Park and never went back. Shoots it from anywhere south of the river, and most places north of it. Top scorer of the summer open runs by a distance.",
+        stats: [{ v: '24.1', k: 'Points' }, { v: '41%', k: 'From three' }, { v: '4.0', k: 'Rebounds' }],
+        facts: [{ k: 'Height', v: "5'10\" / 178 cm" }, { k: 'Age', v: '22' }, { k: 'Home court', v: "Queen's Park, Southside" }, { k: 'Signature', v: 'Step-back three off one dribble' }] },
+      { img: ((window.__resources || {}).p3 || 'img/p3.jpg'), seed: '03', area: 'Govan', crew: 'Govan Graft', player: 'Imran Qureshi', role: 'Power forward', num: '24', quote: 'Ten years of Sunday mornings at Elder Park.', par: '0.05',
+        bio: "Ten years of Sunday mornings at Elder Park, rain or not. Does the jobs nobody films: boxing out, setting screens, taking the charge. The Graft are named after the way he plays, more or less, and he's never once asked for the ball.",
+        stats: [{ v: '14.8', k: 'Points' }, { v: '11.3', k: 'Rebounds' }, { v: '1.9', k: 'Blocks' }],
+        facts: [{ k: 'Height', v: "6'5\" / 196 cm" }, { k: 'Age', v: '26' }, { k: 'Home court', v: 'Elder Park, Govan' }, { k: 'Signature', v: 'Short roll, kick-out to the corner' }] },
+      { img: ((window.__resources || {}).p4 || 'img/p4.jpg'), seed: '04', area: 'Clydebank', crew: 'Clydebank Cranes', player: 'Callum Doig', role: 'Centre', num: '50', quote: 'Nobody gets a clean look at the rim.', par: '0.18',
+        bio: "A former shipyard apprentice who came to the game late and came to it big. Patient on the block and impossible to move off it. When he's home in the paint, nobody in the field gets a clean look at the rim.",
+        stats: [{ v: '16.2', k: 'Points' }, { v: '12.7', k: 'Rebounds' }, { v: '3.1', k: 'Blocks' }],
+        facts: [{ k: 'Height', v: "6'9\" / 206 cm" }, { k: 'Age', v: '29' }, { k: 'Home court', v: 'Dalmuir Park, Clydebank' }, { k: 'Signature', v: 'Drop step, left shoulder, every time' }] }
+    ];
+    F.forEach((f, i) => { f.open = () => this.openBio(i); const p = f.player.split(' '); f.first = p[0]; f.last = p.slice(1).join(' '); });
+    return (this.__f = F);
+  }
+
+  _crews() {
+    if (this.__c) return this.__c;
+    const base = [['01','Gorbals Ghosts','Gorbals','Gorbals cage, Cumberland St'],['02','Southside Saints','Shawlands',"Queen's Park courts"],['03','Govan Graft','Govan','Elder Park'],['04','Clydebank Cranes','Clydebank','Dalmuir Park'],['05','Partick Pressure','West End','Partick Burgh Hall courts'],['06','Leith Lightning','Edinburgh','Leith Links'],['07','Dundee Dockers','Dundee','Baxter Park'],['08','Possil Pace','Possilpark','Possil cage'],['09','Kelvin Kings','Kelvingrove','Kelvingrove Park courts'],['10','Paisley Pattern','Paisley','Barshaw Park'],['11','Granite City','Aberdeen','Duthie Park'],['12','Barras Ballers','East End','Glasgow Green'],['13','Calton Concrete','Calton','Calton multi-court'],['14','Dennistoun Drive','Dennistoun','Alexandra Park'],['15','Springburn Spark','Springburn','Springburn Park'],['16','Pollok Press','Pollok','Pollok Country Park']];
+    const FN = ['Jamie','Ross','Aiden','Kyle','Marcus','Tariq','Euan','Darnell','Fraser','Ayo','Liam','Hamza','Callum','Jordan','Niall','Tobi','Craig','Ravi','Scott','Kwame','Ryan','Sami','Lewis','Dylan','Mo','Connor','Ibrahim','Grant','Andre','Finlay','Malik','Gregor'];
+    const LN = ['Campbell','Okafor','MacLeod','Hussain','Reid','Boateng','Murray','Singh','Docherty','Mensah','Stewart','Ali','Fraser','Nwosu','McAllister','Kerr','Bello','Paterson','Iqbal','Gallacher','Osei','Robertson','Malik','Hendry','Adebayo','Quinn','Grant','Shah','McKenzie','Owusu','Wallace','Lennox'];
+    const CF = ['Gail','Tam','Rab','Deborah','Sanjay','Ewan','Morag','Femi','Alan','Karen','Bashir','Stevie','Lorna','Des','Iain','Ruth'];
+    const POS = [['PG','Point guard',[70,73]],['SG','Shooting guard',[72,75]],['SF','Small forward',[74,77]],['PF','Power forward',[75,78]],['C','Centre',[77,81]],['G','Guard',[70,74]],['F','Forward',[73,77]],['F','Forward',[74,78]]];
+    const tags = ['Captain','','','','','Sixth man','',''];
+    const ft = (inch) => Math.floor(inch / 12) + "'" + (inch % 12) + '"';
+    const F = this._featured();
+    const fix = { '01': [0, F[0]], '02': [1, F[1]], '03': [3, F[2]], '04': [4, F[3]] };
+    const C = base.map(([s, n, a, court], ci) => {
+      let seed = ci * 7919 + 13; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      const used = new Set();
+      const players = POS.map(([pos, full, [lo, hi]], pi) => {
+        let no; do { no = String(Math.floor(rnd() * 55)); } while (used.has(no)); used.add(no);
+        return { no, name: FN[Math.floor(rnd() * FN.length)] + ' ' + LN[Math.floor(rnd() * LN.length)], pos, tag: tags[pi] || full, h: ft(lo + Math.floor(rnd() * (hi - lo + 1))) };
+      });
+      const fx = fix[s];
+      if (fx) { const [pi, f] = fx; players.forEach(p => { if (p.tag === 'Captain') p.tag = players[0].pos === 'PG' && pi !== 0 ? 'Point guard' : p.tag; }); players[0].tag = pi === 0 ? 'Captain' : 'Point guard'; players[pi] = Object.assign({}, players[pi], { no: String(parseInt(f.num, 10)), name: f.player, h: f.facts[0].v.split(' /')[0], tag: pi === 0 ? 'Captain · ' + f.role : 'Captain · ' + f.role }); }
+      const w = 10 - Math.min(9, Math.floor(ci / 2.2)) , l = 10 - w + (ci > 3 ? 0 : 0);
+      const firstOpp = base[15 - ci][1];
+      return { s, n, a, court, players, rec: (ci < 4 ? 10 : w) + '–' + (ci < 4 ? 0 : l), ppg: (78 - ci * 1.3 + rnd() * 3).toFixed(1), est: String(2009 + Math.floor(rnd() * 14)), coach: CF[ci] + ' ' + LN[(ci * 5 + 3) % LN.length], first: 'Fri 14 May vs ' + firstOpp, open: () => this.openTeam(ci) };
+    });
+    return (this.__c = C);
+  }
+
+  openTeam(i) {
+    this.setState({ team: i });
+    const el = document.querySelector('[data-team]'), bg = document.querySelector('[data-team-bg]');
+    if (!el) return;
+    el.scrollTop = 0; el.style.transform = 'translateX(0)';
+    if (bg) { bg.style.opacity = '1'; bg.style.pointerEvents = 'auto'; }
+    this._teamOpen = true;
+    if (this._lenis) this._lenis.stop();
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  closeTeam() {
+    const el = document.querySelector('[data-team]'), bg = document.querySelector('[data-team-bg]');
+    if (el) el.style.transform = 'translateX(104%)';
+    if (bg) { bg.style.opacity = '0'; bg.style.pointerEvents = 'none'; }
+    this._teamOpen = false;
+    if (this._lenis) this._lenis.start();
+    document.documentElement.style.overflow = '';
+  }
+
+  stepTeam(d) {
+    const n = this._crews().length, i = (((this.state.team || 0) + d) % n + n) % n;
+    const inn = document.querySelector('[data-team-in]'), el = document.querySelector('[data-team]');
+    if (inn) inn.style.opacity = '0';
+    setTimeout(() => { this.setState({ team: i }); if (el) el.scrollTop = 0; if (inn) inn.style.opacity = '1'; }, 220);
+  }
+
+  openBio(i) {
+    this.setState({ sel: i });
+    const el = document.querySelector('[data-bio]'), im = document.querySelector('[data-bio-img]');
+    if (!el) return;
+    el.scrollTop = 0;
+    el.style.transform = 'translateY(0)';
+    if (im) { im.style.transform = 'scale(1.12)'; setTimeout(() => { im.style.transform = 'scale(1)'; }, 60); }
+    this._bioOpen = true;
+    if (this._lenis) this._lenis.stop();
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  closeBio() {
+    const el = document.querySelector('[data-bio]');
+    if (el) el.style.transform = 'translateY(102%)';
+    this._bioOpen = false;
+    if (this._lenis) this._lenis.start();
+    document.documentElement.style.overflow = '';
+  }
+
+  stepBio(d) {
+    const n = this._featured().length, i = (((this.state.sel || 0) + d) % n + n) % n;
+    const inn = document.querySelector('[data-bio-in]'), el = document.querySelector('[data-bio]'), im = document.querySelector('[data-bio-img]');
+    if (inn) inn.style.opacity = '0';
+    setTimeout(() => {
+      this.setState({ sel: i });
+      if (el) el.scrollTop = 0;
+      if (im) { im.style.transition = 'none'; im.style.transform = 'scale(1.12)'; void im.offsetWidth; im.style.transition = ''; im.style.transform = 'scale(1)'; }
+      if (inn) inn.style.opacity = '1';
+    }, 240);
+  }
+
+  componentDidMount() {
+    this._onKey = e => { if (this._teamOpen) { if (e.key === 'Escape') this.closeTeam(); if (e.key === 'ArrowRight') this.stepTeam(1); if (e.key === 'ArrowLeft') this.stepTeam(-1); return; } if (!this._bioOpen) return; if (e.key === 'Escape') this.closeBio(); if (e.key === 'ArrowRight') this.stepBio(1); if (e.key === 'ArrowLeft') this.stepBio(-1); };
+    window.addEventListener('keydown', this._onKey);
+    this._boot();
+  }
+
+  componentWillUnmount() {
+    this._dead = true;
+    window.removeEventListener('keydown', this._onKey);
+    document.documentElement.style.overflow = '';
+    cancelAnimationFrame(this._raf);
+    (this._off || []).forEach(f => f());
+    if (this._lenis) this._lenis.destroy();
+    if (this._r) this._r.dispose();
+  }
+
+  async _boot() {
+    const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+    const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const seg = (p, a, b) => clamp((p - a) / (b - a));
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const sstep = t => t * t * (3 - 2 * t);
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const on = (el, ev, fn, o) => { el.addEventListener(ev, fn, o); (this._off = this._off || []).push(() => el.removeEventListener(ev, fn, o)); };
+    const wait = n => new Promise(r => { const t = () => window[n] ? r(window[n]) : setTimeout(t, 40); t(); });
+    const prop = (k, d) => (this.props && this.props[k] !== undefined ? this.props[k] : d);
+
+    // grain
+    const grain = $('[data-grain]');
+    grain.style.backgroundImage = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+
+    // loader
+    const loader = $('[data-loader]'), lnum = $('[data-loader-num]'), lbar = $('[data-loader-bar]');
+    const heroImgs = $$('[data-hero-img]');
+    let imgsDone = false;
+    Promise.race([
+      Promise.all(heroImgs.map(im => im.complete ? 1 : new Promise(r => { im.addEventListener('load', r, { once: true }); im.addEventListener('error', r, { once: true }); }))),
+      new Promise(r => setTimeout(r, 7000))
+    ]).then(() => { imgsDone = true; });
+    const lt0 = performance.now();
+    let introT0 = null;
+    await new Promise(res => {
+      const tick = () => {
+        const k = clamp((performance.now() - lt0) / (reduce ? 300 : 1500));
+        const v = Math.floor(ease(k) * (imgsDone ? 100 : 86));
+        lnum.textContent = String(v).padStart(3, '0');
+        lbar.style.transform = `scaleX(${v / 100})`;
+        if (k >= 1 && imgsDone) { lnum.textContent = '100'; lbar.style.transform = 'scaleX(1)'; res(); } else requestAnimationFrame(tick);
+      };
+      tick();
+    });
+    loader.style.transform = 'translateY(-100%)';
+    introT0 = performance.now() + 250;
+    setTimeout(() => { loader.style.display = 'none'; }, 1300);
+
+    const THREE = await wait('THREE');
+    if (this._dead) return;
+
+    // smooth scroll
+    let lenis = null;
+    if (prop('smooth', true) && !reduce && window.Lenis) {
+      lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
+      this._lenis = lenis;
+    }
+    $$('a[href^="#"]').forEach(a => on(a, 'click', e => {
+      const id = a.getAttribute('href').slice(1); const t = id ? document.getElementById(id) : null;
+      if (!t) return; e.preventDefault();
+      const y = t.getBoundingClientRect().top + window.scrollY;
+      if (lenis) lenis.scrollTo(y, { duration: 2.2 }); else window.scrollTo({ top: y, behavior: 'smooth' });
+    }));
+
+    // three
+    const canvas = $('[data-gl]');
+    const isM = () => window.innerWidth < 760;
+    const r = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true });
+    this._r = r;
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, isM() ? 1.6 : 2));
+    r.outputEncoding = THREE.sRGBEncoding;
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    cam.position.set(0, 0, 10);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+    const dl = new THREE.DirectionalLight(0xffe2c0, 1.6); dl.position.set(-2, 5, 6); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0xff6a13, 1.2); dl2.position.set(4, -2, 2); scene.add(dl2);
+
+    const ballMat = new THREE.ShaderMaterial({
+      uniforms: { uT: { value: 0 } },
+      vertexShader: `varying vec3 vP; varying vec3 vN; varying vec3 vV;
+        void main(){ vP=position; vN=normalize(normalMatrix*normal); vec4 mv=modelViewMatrix*vec4(position,1.); vV=-mv.xyz; gl_Position=projectionMatrix*mv; }`,
+      fragmentShader: `varying vec3 vP; varying vec3 vN; varying vec3 vV;
+        float h(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+        float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+          return mix(mix(mix(h(i),h(i+vec3(1,0,0)),f.x),mix(h(i+vec3(0,1,0)),h(i+vec3(1,1,0)),f.x),f.y),
+                     mix(mix(h(i+vec3(0,0,1)),h(i+vec3(1,0,1)),f.x),mix(h(i+vec3(0,1,1)),h(i+vec3(1,1,1)),f.x),f.y),f.z);}
+        void main(){
+          vec3 p=normalize(vP);
+          float d=min(abs(p.x),abs(p.y));
+          d=min(d,abs(abs(p.z)-0.70));
+          float w=0.02;
+          float seam=1.-smoothstep(w*.55,w,d);
+          float groove=1.-smoothstep(w,w*2.6,d);
+          float pb=n3(p*95.), pb2=n3(p*14.);
+          vec3 base=mix(vec3(.26,.06,.012),vec3(.78,.25,.05),.6+.4*pb2);
+          base*=.82+.3*pb;
+          vec3 N=normalize(vN+(vec3(pb,n3(p*95.+7.),0.)-.5)*.10); vec3 V=normalize(vV);
+          vec3 L=normalize(vec3(-.45,.85,.6)); vec3 L2=normalize(vec3(.9,-.3,.35));
+          float df=max(dot(N,L),0.), df2=max(dot(N,L2),0.);
+          vec3 H=normalize(L+V); float sp=pow(max(dot(N,H),0.),36.)*(.18+.35*pb);
+          float fr=pow(1.-max(dot(normalize(vN),V),0.),3.);
+          vec3 col=base*(.10+1.15*df*vec3(1.,.88,.74)+.45*df2*vec3(1.,.48,.18));
+          col*=1.-.5*groove;
+          col=mix(col,vec3(.02,.018,.016),seam);
+          col+=sp*vec3(1.,.86,.7)*(1.-seam)+fr*vec3(1.,.42,.12)*.6;
+          gl_FragColor=vec4(pow(col,vec3(.78)),1.);
+        }`
+    });
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), ballMat);
+    ball.rotation.set(0.4, 0.6, 0.2);
+    scene.add(ball);
+
+    // rain
+    const RN = isM() ? 650 : 1300;
+    const rp = new Float32Array(RN * 6), re = new Float32Array(RN * 2), rr = new Float32Array(RN * 2);
+    for (let i = 0; i < RN; i++) {
+      const x = (Math.random() - .5) * 26, y = (Math.random() - .5) * 18, z = -8 + Math.random() * 12, k = Math.random();
+      for (let j = 0; j < 2; j++) { rp.set([x, y, z], (i * 2 + j) * 3); re[i * 2 + j] = j; rr[i * 2 + j] = k; }
+    }
+    const rg = new THREE.BufferGeometry();
+    rg.setAttribute('position', new THREE.BufferAttribute(rp, 3));
+    rg.setAttribute('aEnd', new THREE.BufferAttribute(re, 1));
+    rg.setAttribute('aR', new THREE.BufferAttribute(rr, 1));
+    const rainMat = new THREE.ShaderMaterial({
+      uniforms: { uT: { value: 0 }, uRain: { value: 1 }, uLen: { value: .55 } },
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: `attribute float aEnd; attribute float aR; uniform float uT; uniform float uLen; varying float vA; varying float vE;
+        void main(){ vec3 p=position; p.y=mod(p.y-uT*(0.75+aR*.6)+9.,18.)-9.; p.x+=mod(uT*.6*(0.75+aR*.6),1.)*0.;
+          p.y+=aEnd*uLen*(.7+aR*.6); p.x-=aEnd*uLen*.18; vA=.3+.7*aR; vE=aEnd;
+          gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.); }`,
+      fragmentShader: `uniform float uRain; varying float vA; varying float vE;
+        void main(){ gl_FragColor=vec4(1.,.8,.6, uRain*vA*(.05+.45*vE)*.55); }`
+    });
+    const rain = new THREE.LineSegments(rg, rainMat);
+    scene.add(rain);
+
+    // hoop
+    const hoop = new THREE.Group();
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(1, .05, 14, 72), new THREE.MeshStandardMaterial({ color: 0xff5a10, metalness: .55, roughness: .35, emissive: 0x401000 }));
+    rim.rotation.x = Math.PI / 2; hoop.add(rim);
+    const netPts = [], NS = 14, NL = 5;
+    const np = (i, j) => { const a = (i / NS) * Math.PI * 2 + j * (Math.PI / NS); const rad = 1 - j * .085; return [Math.cos(a) * rad, -j * .3, Math.sin(a) * rad]; };
+    for (let j = 0; j < NL - 1; j++) for (let i = 0; i < NS; i++) { netPts.push(...np(i, j), ...np(i, j + 1), ...np(i + 1, j), ...np(i, j + 1)); }
+    const netG = new THREE.BufferGeometry(); netG.setAttribute('position', new THREE.Float32BufferAttribute(netPts, 3));
+    const net = new THREE.LineSegments(netG, new THREE.LineBasicMaterial({ color: 0xf1ede6, transparent: true, opacity: .75 }));
+    hoop.add(net);
+    const bb = [], R = (x1, y1, x2, y2, z) => bb.push(x1, y1, z, x2, y1, z, x2, y1, z, x2, y2, z, x2, y2, z, x1, y2, z, x1, y2, z, x1, y1, z);
+    R(-1.9, -.35, 1.9, 2.15, -1.2); R(-.62, .1, .62, 1.0, -1.2);
+    bb.push(0, 0, -1, 0, 0, -1.2, 0, .02, -1, 0, .1, -1.2);
+    const bbG = new THREE.BufferGeometry(); bbG.setAttribute('position', new THREE.Float32BufferAttribute(bb, 3));
+    hoop.add(new THREE.LineSegments(bbG, new THREE.LineBasicMaterial({ color: 0xf1ede6, transparent: true, opacity: .9 })));
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 2.5), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .045, depthWrite: false }));
+    glass.position.set(0, .9, -1.21); hoop.add(glass);
+    hoop.rotation.x = .3;
+    hoop.visible = false;
+    scene.add(hoop);
+
+    // sections
+    const secs = {};
+    $$('[data-sec]').forEach(el => { secs[el.dataset.sec] = { el, stage: el.querySelector('[data-stage]'), sticky: el.hasAttribute('data-sticky') }; });
+    const layers = $$('[data-layer]').map(w => ({ w, img: w.querySelector('img') }));
+    const wls = $$('[data-wl]'), wchars = $$('[data-wordmark] [data-ch]');
+    const beats = [1, 2, 3].map(i => { const el = $(`[data-beat="${i}"]`); return { el, ch: Array.from(el.querySelectorAll('[data-ch]')) }; });
+    const el = {
+      wordmark: $('[data-wordmark]'), hmeta: $('[data-hmeta]'), flash: $('[data-flash]'), endfade: $('[data-endfade]'),
+      manImg: $('[data-man-img]'), mq: $$('[data-mq]'), words: $$('[data-w]'), track: $('[data-track]'),
+      vclip: $('[data-venue-clip]'), vimg: $('[data-venue-img]'), vl: $$('[data-vl]'), vdet: $('[data-vdet]'),
+      swish: $('[data-swish]'), swishword: $('[data-swishword]'), spot: $('[data-spot]'),
+      chapN: $('[data-chap-n]'), chapL: $('[data-chap-l]'), prog: $('[data-prog]'), hint: $('[data-hint]'), cursor: $('[data-cursor]'),
+      pars: $$('[data-par]'), hoopB: $('[data-hoop-b]'), hoopF: $('[data-hoop-f]')
+    };
+
+    // ball keyframes: [section, p, x, y, size, bounce, mobile]
+    const KF = [
+      ['hero', 0, .5, -.42, .17, 0, [.45, .52, .26]],
+      ['hero', .12, .62, -.56, .11, 0, [.55, .6, .16]],
+      ['hero', .48, .56, -.62, .09, 0, [.5, -.7, .15]],
+      ['hero', .64, 0, .12, .03, 0, [0, .12, .05]],
+      ['hero', .68, 0, .12, 0, 0, [0, .12, 0]],
+      ['hero', .99, .5, 1.6, 0, 0, [.35, 1.6, 0]],
+      ['man', 0, .5, 1.6, .2, 0, [.35, 1.6, .3]],
+      ['man', .14, .52, -.05, .22, 1, [.4, .02, .3]],
+      ['man', 1, .52, -.05, .22, 1, [.4, .02, .3]],
+      ['week', 0, .74, .5, .11, .7, [.62, .6, .17]],
+      ['week', 1, .74, .5, .11, .7, [.62, .6, .17]],
+      ['crews', .1, -.82, .78, .07, 0, [.72, .8, .12]],
+      ['crews', .9, .82, .78, .07, 0, [.72, .8, .12]],
+      ['venue', .1, .82, -.72, .08, 0, [.7, -.78, .12]],
+      ['venue', 1, -.75, -.55, .1, 0, [-.6, -.1, .16]],
+      ['tix', .12, -1.4, -1.4, .06, 0, [-1.4, -1.4, .06]]
+    ];
+    const CH = [['hero', 0, 'The Clyde'], ['hero', .17, 'The doors'], ['hero', .44, 'The tunnel'], ['hero', .74, 'The floor'], ['man', 0, 'The code'], ['week', 0, 'The weekend'], ['crews', .05, 'The crews'], ['venue', 0, 'The Hydro'], ['shot', 0, 'The last shot'], ['tix', .25, 'Tickets']];
+    let vw = 0, vh = 0, HH = 0, HW = 0, kfs = [], chs = [], focal = [];
+    const pos = (k, p) => { const s = secs[k]; return s.sticky ? s.top + p * (s.h - s.sh) : s.top - vh + p * (s.h + vh); };
+    const coverPt = (fx, fy) => { const iw = 1344, ih = 752, c = Math.max(vw / iw, vh / ih), dw = iw * c, dh = ih * c; return [((vw - dw) / 2 + fx * dw) / vw * 100, ((vh - dh) / 2 + fy * dh) / vh * 100]; };
+    const measure = () => {
+      vw = window.innerWidth; vh = window.innerHeight;
+      r.setSize(vw, vh, false); cam.aspect = vw / vh; cam.updateProjectionMatrix();
+      HH = Math.tan((35 / 2) * Math.PI / 180) * 10; HW = HH * cam.aspect;
+      const wk = secs.week, sh = wk.stage.offsetHeight;
+      wk.dist = Math.max(0, el.track.scrollWidth - vw);
+      wk.el.style.height = (wk.dist + sh + vh * .35) + 'px';
+      for (const k in secs) { const s = secs[k]; const b = s.el.getBoundingClientRect(); s.top = b.top + window.scrollY; s.h = s.el.offsetHeight; s.sh = s.stage ? s.stage.offsetHeight : vh; }
+      const m = isM();
+      kfs = KF.map(k => { const mm = m && k[6]; return { y: pos(k[0], k[1]), x: mm ? k[6][0] : k[2], yy: mm ? k[6][1] : k[3], s: mm ? k[6][2] : k[4], b: k[5] }; }).sort((a, b) => a.y - b.y);
+      chs = CH.map(c => ({ y: pos(c[0], c[1]), l: c[2] }));
+      focal = [coverPt(.55, .46), coverPt(.55, .38), coverPt(.49, .4), coverPt(.5, .5)];
+      layers.forEach((L, i) => { L.img.style.transformOrigin = `${focal[i][0]}% ${focal[i][1]}%`; });
+      el.spot.style.background = m ? 'radial-gradient(70% 45% at 50% 22%, rgba(255,140,60,.3) 0%, rgba(255,106,19,.07) 45%, rgba(12,11,10,0) 75%)' : 'radial-gradient(42% 60% at 66% 22%, rgba(255,140,60,.3) 0%, rgba(255,106,19,.07) 45%, rgba(12,11,10,0) 75%)';
+    };
+    measure();
+    let resizeT; on(window, 'resize', () => { clearTimeout(resizeT); resizeT = setTimeout(measure, 120); });
+    setTimeout(measure, 400); setTimeout(measure, 1500);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => !this._dead && measure());
+
+    let curY = 0;
+    const P = s => s.sticky ? clamp((curY - s.top) / Math.max(1, s.h - s.sh)) : clamp((curY - s.top + vh) / (s.h + vh));
+
+    // pointer
+    let mx = 0, my = 0, cx = -100, cy = -100, cur = { x: -100, y: -100 }, hov = false, tapT = -10, spinKick = 0;
+    const ballScreen = { x: 0, y: 0, r: 0 };
+    on(window, 'pointermove', e => { cur.x = e.clientX; cur.y = e.clientY; mx = e.clientX / vw * 2 - 1; my = e.clientY / vh * 2 - 1; hov = !!(e.target.closest && e.target.closest('a,button,[data-hover],[data-tilt]')); }, { passive: true });
+    on(window, 'pointerdown', e => {
+      const dx = e.clientX - ballScreen.x, dy = e.clientY - ballScreen.y;
+      if (ballScreen.r > 4 && dx * dx + dy * dy < Math.pow(ballScreen.r * 1.25, 2)) { tapT = clock; spinKick = 9; }
+    }, { passive: true });
+    if (fine) el.cursor.style.opacity = '1';
+
+    $$('[data-tilt]').forEach(t => {
+      const inn = t.querySelector('[data-tilt-in]'), im = t.querySelector('[data-tilt-img]');
+      on(t, 'pointermove', e => {
+        if (e.pointerType !== 'mouse') return;
+        const b = t.getBoundingClientRect(), px = (e.clientX - b.left) / b.width - .5, py = (e.clientY - b.top) / b.height - .5;
+        inn.style.transform = `rotateY(${px * 12}deg) rotateX(${-py * 12}deg)`;
+        im.style.transform = `translate(${px * -18}px, ${py * -18}px) scale(1.06)`;
+      });
+      on(t, 'pointerleave', () => { inn.style.transform = ''; im.style.transform = ''; });
+      on(t, 'keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t.click(); } });
+    });
+    $$('[aria-label="Open team roster"]').forEach(t => on(t, 'keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t.click(); } }));
+
+    // loop
+    let last = performance.now(), clock = 0, vel = 0, lastY = window.scrollY, frame = 0, chapIdx = -1;
+    let rainCur = 1, bx = 0, by = 0, bs = 0, first = true;
+    const loop = now => {
+      if (this._dead) return;
+      this._raf = requestAnimationFrame(loop);
+      const dt = Math.min(.05, (now - last) / 1000); last = now; clock += dt; frame++;
+      if (lenis) lenis.raf(now);
+      const y = (window.__pgrY != null ? window.__pgrY : window.scrollY), dy = y - lastY; lastY = y; curY = y;
+      vel = lerp(vel, clamp(dy / Math.max(dt, .001) / 1000, -6, 6), .12);
+      const m = isM();
+
+      // intro
+      const ik = introT0 ? clamp((now - introT0) / (reduce ? 1 : 1500)) : 0;
+
+      // HERO
+      const H = secs.hero, hp = P(H);
+      const heroOn = y < H.top + H.h;
+      if (heroOn) {
+        const L = layers;
+        const a0 = eio(seg(hp, 0, .3));
+        L[0].img.style.transform = `scale(${1.06 + .95 * a0})`;
+        const a1 = eio(seg(hp, .12, .3)), a1b = eio(seg(hp, .3, .56));
+        L[1].w.style.clipPath = `circle(${a1 * 150}% at ${focal[0][0]}% ${focal[0][1]}%)`;
+        L[1].img.style.transform = `scale(${1.4 - .4 * a1 + .6 * a1b})`;
+        const a2 = eio(seg(hp, .42, .56)), a2b = Math.pow(seg(hp, .56, .8), 1.5), ins = (1 - a2) * 50;
+        L[2].w.style.clipPath = `inset(${ins * .9 + (focal[1][1] - 50) * (1 - a2) * .9}% ${ins}% ${ins * 1.1 - (focal[1][1] - 50) * (1 - a2) * .9}% ${ins}%)`;
+        L[2].img.style.transform = `scale(${1.3 - .3 * a2 + 1.5 * a2b})`;
+        const a3 = eio(seg(hp, .7, .8)), a3b = ease(seg(hp, .72, 1));
+        L[3].w.style.clipPath = `circle(${a3 * 150}% at ${focal[2][0]}% ${focal[2][1]}%)`;
+        L[3].img.style.transform = `scale(${1.7 - .62 * a3b})`;
+        el.flash.style.opacity = (Math.sin(Math.PI * seg(hp, .64, .82)) * .92).toFixed(3);
+        el.endfade.style.opacity = seg(hp, .93, 1).toFixed(3);
+
+        const E = seg(hp, .012, .13);
+        wchars.forEach((c, i) => { const k = clamp(ik * 1.7 - i * .045); c.style.transform = `translateY(${(1 - ease(k)) * 105}%)`; });
+        el.wordmark.style.opacity = (1 - Math.pow(E, .8)).toFixed(3);
+        wls[0].style.transform = `translateX(${-E * 38}vw)`;
+        wls[1].style.transform = `translateX(${E * 26}vw)`;
+        wls[2].style.transform = `translateX(${-E * 16}vw)`;
+        el.hmeta.style.opacity = (ease(seg(ik, .5, 1)) * (1 - seg(hp, 0, .05))).toFixed(3);
+
+        const W = [[.17, .4], [.44, .66], [.78, .95]];
+        beats.forEach((B, i) => {
+          const [a, b] = W[i]; const fi = seg(hp, a, a + .06), fo = seg(hp, b - .05, b);
+          B.el.style.opacity = (Math.min(1, fi * 3) * (1 - fo)).toFixed(3);
+          B.el.style.transform = `translateY(${-fo * 40}px)`;
+          B.ch.forEach((c, j) => { const k = clamp(fi * 1.6 - j * .1); c.style.transform = `translateY(${(1 - ease(k)) * 105}%)`; });
+        });
+      }
+
+      // MANIFESTO
+      const M = secs.man, mp = P(M);
+      if (y > M.top - vh && y < M.top + M.h) {
+        el.manImg.style.transform = `scale(${1.2 - .14 * mp}) translateY(${-mp * 3}%)`;
+        const sk = clamp(vel * 2.2, -8, 8);
+        el.mq[0].style.transform = `translateX(${-mp * 42}%) skewX(${-sk}deg)`;
+        el.mq[1].style.transform = `translateX(${-42 + mp * 42}%) skewX(${-sk}deg)`;
+        const N = el.words.length;
+        el.words.forEach((w, i) => { const a = .18 + (i / N) * .62; w.style.opacity = (.14 + .86 * seg(mp, a, a + .05)).toFixed(3); });
+      }
+
+      // WEEK
+      const Wk = secs.week;
+      if (y > Wk.top - vh && y < Wk.top + Wk.h) {
+        const px = clamp(y - Wk.top, 0, Wk.dist);
+        el.track.style.transform = `translate3d(${-px}px,0,0)`;
+      }
+
+      // parallax cards
+      if (frame % 1 === 0) el.pars.forEach(p => { const b = p.parentElement.getBoundingClientRect(); const c = (b.top + b.height / 2 - vh / 2); p.style.transform = `translateY(${c * -parseFloat(p.dataset.par || 0)}px)`; });
+
+      // VENUE
+      const V = secs.venue, vp = P(V);
+      if (y > V.top - vh && y < V.top + V.h) {
+        const t = eio(seg(vp, 0, .55));
+        el.vclip.style.clipPath = m ? `inset(${(1 - t) * 30}% ${(1 - t) * 10}% ${(1 - t) * 30}% ${(1 - t) * 10}%)` : `inset(${(1 - t) * 26}% ${(1 - t) * 30}% ${(1 - t) * 26}% ${(1 - t) * 30}%)`;
+        el.vimg.style.transform = `scale(${1.35 - .3 * t})`;
+        const l1 = ease(seg(vp, .32, .55)), l2 = ease(seg(vp, .4, .62));
+        el.vl[0].style.opacity = l1; el.vl[0].style.transform = `translateX(${(1 - l1) * -30}%)`;
+        el.vl[1].style.opacity = l2; el.vl[1].style.transform = `translateX(${(1 - l2) * 30}%)`;
+        el.vdet.style.opacity = ease(seg(vp, .58, .74));
+      }
+
+      // BALL target from keyframes
+      let tx = 0, ty = 0, ts = 0, tb = 0;
+      if (y <= kfs[0].y) { tx = kfs[0].x; ty = kfs[0].yy; ts = kfs[0].s; tb = kfs[0].b; }
+      else if (y >= kfs[kfs.length - 1].y) { const k = kfs[kfs.length - 1]; tx = k.x; ty = k.yy; ts = k.s; tb = k.b; }
+      else for (let i = 0; i < kfs.length - 1; i++) { const a = kfs[i], b = kfs[i + 1]; if (y >= a.y && y < b.y) { const t = sstep((y - a.y) / Math.max(1, b.y - a.y)); tx = lerp(a.x, b.x, t); ty = lerp(a.yy, b.yy, t); ts = lerp(a.s, b.s, t); tb = lerp(a.b, b.b, t); break; } }
+
+      const minD = Math.min(vw, vh);
+      let wx = tx * HW, wy = ty * HH, wr = ts * minD * HH / vh;
+      if (tb > 0.01) { const s = Math.abs(Math.sin(clock * 3.4)); wy += tb * .2 * HH * s; }
+      const tapK = clock - tapT;
+      if (tapK < 2.5) wy += .25 * HH * Math.abs(Math.sin(tapK * 7)) * Math.exp(-tapK * 1.8) * Math.max(.4, ts * 4);
+
+      // SHOT override
+      const S = secs.shot, sp = P(S);
+      let shotMode = false, swishK = 0;
+      const sb = S.stage.getBoundingClientRect();
+      const shotVisible = sb.top < vh && sb.bottom > 0 && y > S.top - vh;
+      if (shotVisible) {
+        const off = -(sb.top / vh) * 2 * HH;
+        const hx = (m ? 0 : .32) * HW, hy = (m ? .36 : .3) * HH + off;
+        const br = (m ? .15 : .12) * minD * HH / vh, rimR = br * 1.85;
+        hoop.visible = false;
+        { const hsx = (hx / HW * .5 + .5) * vw, hsy = (-hy / HH * .5 + .5) * vh, rp = rimR / HH * vh * .5, W = rp / .22, kick = Math.sin(Math.PI * seg(sp, .5, .62)) * W * .018;
+          const tf = `translate(${hsx - W * .5}px, ${hsy - W * .4 + kick}px)`;
+          [el.hoopB, el.hoopF].forEach(h => { h.style.width = W + 'px'; h.style.height = W + 'px'; h.style.transform = tf; h.style.opacity = '1'; }); }
+        hoop.position.set(hx, hy, 0);
+        hoop.scale.setScalar(rimR);
+        const sx = (m ? -.6 : -.75) * HW, sy = (m ? -.1 : -.55) * HH + off;
+        const q = seg(sp, .08, .48), q2 = seg(sp, .48, .6), q3 = seg(sp, .6, .78);
+        const above = rimR * 1.6, below = rimR * 2.8;
+        let px, py;
+        if (sp < .48) { px = lerp(sx, hx, q); py = lerp(sy, hy + above, q) + HH * (m ? .5 : .85) * 4 * q * (1 - q); }
+        else if (sp < .6) { px = hx; py = lerp(hy + above, hy - below, Math.pow(q2, 1.3)); }
+        else { px = hx; py = lerp(hy - below, -HH * 1.4 + off * 0, q3 * q3); }
+        if (sp > .02 || sb.top < vh * .5) { shotMode = true; wx = px; wy = py; wr = br; if (q3 >= 1) wr = 0; }
+        swishK = Math.sin(Math.PI * seg(sp, .5, .66));
+        net.scale.set(1 - .12 * swishK, 1 + .45 * swishK, 1 - .12 * swishK);
+        net.rotation.y = swishK * .3;
+        const sw = ease(seg(sp, .58, .72));
+        el.swish.style.opacity = sw; el.swish.style.transform = `translateY(${(1 - sw) * 20}px)`;
+        el.swishword.style.opacity = (Math.sin(Math.PI * seg(sp, .52, .9)) * .9).toFixed(3);
+        el.swishword.style.transform = `translateY(-50%) scale(${.8 + .3 * seg(sp, .52, .9)})`;
+      } else { hoop.visible = false; el.hoopB.style.opacity = '0'; el.hoopF.style.opacity = '0'; }
+
+      const kf = shotMode ? .32 : .09;
+      if (first) { bx = wx; by = wy; bs = wr; first = false; }
+      bx = lerp(bx, wx, kf); by = lerp(by, wy, kf); bs = lerp(bs, wr, shotMode ? .3 : .1);
+      ball.visible = bs > .004;
+      ball.position.set(bx + (shotMode ? 0 : mx * .08), by + (shotMode ? 0 : -my * .06), 0);
+      let sq = 1;
+      if (tb > .01 && !shotMode) { const s = Math.abs(Math.sin(clock * 3.4)); sq = 1 - .1 * tb * Math.pow(1 - s, 6); }
+      ball.scale.set(bs * (2 - sq), bs * sq, bs * (2 - sq));
+      spinKick = lerp(spinKick, 0, .03);
+      ball.rotation.x += dt * (.35 + Math.abs(vel) * 2.2 + spinKick + (shotMode ? -4 : 0));
+      ball.rotation.y = lerp(ball.rotation.y, .6 + mx * .7, .05);
+      ball.rotation.z += dt * .08;
+
+      ballScreen.x = (bx / HW * .5 + .5) * vw; ballScreen.y = (-by / HH * .5 + .5) * vh; ballScreen.r = bs / HH * vh * .5;
+      const hintO = heroOn ? (1 - seg(hp, 0, .06)) * ease(seg(ik, .6, 1)) : 0;
+      el.hint.style.opacity = hintO.toFixed(3);
+      if (hintO > 0) el.hint.style.transform = `translate(${ballScreen.x}px, ${ballScreen.y + ballScreen.r + 14}px) translateX(-50%)`;
+
+      // rain
+      let rt = 0;
+      if (heroOn) rt = Math.max(rt, 1 - seg(hp, .42, .56));
+      if (y > M.top - vh && y < M.top + M.h) rt = Math.max(rt, .85 * clamp((y - (M.top - vh)) / vh) * (1 - clamp((y - (M.top + M.h - M.sh)) / (vh * .6))));
+      if (!prop('rain', true)) rt = 0;
+      rainCur = lerp(rainCur, rt, .08);
+      rainMat.uniforms.uRain.value = rainCur;
+      rainMat.uniforms.uT.value += dt * (9 + Math.abs(vel) * 9);
+      rainMat.uniforms.uLen.value = .45 + Math.min(1.2, Math.abs(vel) * .5);
+      rain.visible = rainCur > .01;
+
+      // chrome
+      let ci = 0; for (let i = 0; i < chs.length; i++) if (y + 2 >= chs[i].y) ci = i;
+      if (ci !== chapIdx) { chapIdx = ci; el.chapN.textContent = String(ci + 1).padStart(2, '0'); el.chapL.textContent = chs[ci].l; }
+      const dh = document.documentElement.scrollHeight - vh;
+      el.prog.style.transform = `scaleY(${clamp(y / Math.max(1, dh)).toFixed(4)})`;
+      if (fine) {
+        cx = lerp(cx, cur.x, .2); cy = lerp(cy, cur.y, .2);
+        el.cursor.style.transform = `translate(${cx}px, ${cy}px) scale(${hov ? 1.9 : 1})`;
+        el.cursor.style.background = hov ? '#f1ede6' : 'transparent';
+      }
+      if (frame % 3 === 0) {
+        grain.style.display = prop('grain', true) ? 'block' : 'none';
+        grain.style.transform = `translate(${(Math.random() * 100 - 50) | 0}px, ${(Math.random() * 100 - 50) | 0}px)`;
+      }
+      ballMat.uniforms.uT.value = clock;
+      r.render(scene, cam);
+    };
+    this._raf = requestAnimationFrame(loop);
+  }
+}
+</script>
+</body>
+</html>
